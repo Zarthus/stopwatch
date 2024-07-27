@@ -7,7 +7,9 @@ use std::io::{Read, Write};
 use std::sync::OnceLock;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use iced::theme::Theme;
 use iced::widget::{button, column, container, row, text};
+use iced::window::{self, Position};
 use iced::Length::Fill;
 use iced::{Center, Element, Task};
 
@@ -30,7 +32,7 @@ impl Default for Config {
         Self {
             warn_after_minutes: 45,
             danger_after_minutes: 60,
-            window_size: [150., 80.],
+            window_size: [180., 80.],
             window_position: [40., 40.],
             always_on_top: false,
             start_unpaused: false,
@@ -46,6 +48,14 @@ pub fn main() -> iced::Result {
         state.paused = false;
     }
 
+    let icon = match window::icon::from_file_data(include_bytes!("../resource/icon.png"), None) {
+        Ok(icon) => Some(icon),
+        Err(e) => {
+            eprintln!("Failed to load icon: {}", e);
+            None
+        }
+    };
+
     WARN_SETTINGS
         .set(WarnSettings {
             warn_after: settings.warn_after_minutes as u64 * 60,
@@ -53,14 +63,28 @@ pub fn main() -> iced::Result {
         })
         .expect("Failed to set warn settings");
 
-    iced::application::application("Counter", State::update, State::view)
+    iced::application::application("Stopwatch", State::update, State::view)
+        .window(window::Settings {
+            size: iced::Size::from(settings.window_size),
+            position: Position::Specific(iced::Point::from(settings.window_position)),
+            min_size: Some([180., 80.].into()),
+            visible: true,
+            resizable: true,
+            transparent: true,
+            level: if settings.always_on_top {
+                window::Level::AlwaysOnTop
+            } else {
+                window::Level::Normal
+            },
+            icon,
+            exit_on_close_request: true,
+            ..Default::default()
+        })
         .antialiasing(true)
-        .centered()
-        .exit_on_close_request(true)
         .theme(|_| {
-            let theme = iced::theme::Theme::Dark;
+            let theme = Theme::Dark;
 
-            iced::theme::Theme::custom(
+            Theme::custom(
                 "Custom".to_owned(),
                 iced::theme::palette::Palette {
                     background: theme.palette().background,
@@ -75,17 +99,6 @@ pub fn main() -> iced::Result {
                     danger: theme.palette().danger,
                 },
             )
-        })
-        .resizable(true)
-        .transparent(true)
-        .window_size(iced::Size::from(settings.window_size))
-        .position(iced::window::Position::Specific(iced::Point::from(
-            settings.window_position,
-        )))
-        .level(if settings.always_on_top {
-            iced::window::Level::AlwaysOnTop
-        } else {
-            iced::window::Level::Normal
         })
         .subscription(State::subscription)
         .run_with(|| (state, Task::none()))

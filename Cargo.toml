@@ -19,7 +19,7 @@ toml = { version = "0.8", features = ["preserve_order"] }
 git = "https://github.com/iced-rs/iced.git"
 # branch = "master"
 rev = "555ee3e9"
-features = ["smol"]
+features = ["smol", "image"]
 
 [features]
 default = ["store_sessions"]
