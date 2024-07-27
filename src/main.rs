@@ -5,7 +5,7 @@
 
 use std::io::{Read, Write};
 use std::sync::OnceLock;
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use iced::widget::{button, column, container, row, text};
 use iced::Length::Fill;
@@ -41,7 +41,10 @@ impl Default for Config {
 
 pub fn main() -> iced::Result {
     let settings = load_config();
-    let state = State::default();
+    let mut state = State::default();
+    if settings.start_unpaused {
+        state.paused = false;
+    }
 
     WARN_SETTINGS
         .set(WarnSettings {
@@ -79,6 +82,11 @@ pub fn main() -> iced::Result {
         .position(iced::window::Position::Specific(iced::Point::from(
             settings.window_position,
         )))
+        .level(if settings.always_on_top {
+            iced::window::Level::AlwaysOnTop
+        } else {
+            iced::window::Level::Normal
+        })
         .subscription(State::subscription)
         .run_with(|| (state, Task::none()))
 }
@@ -147,13 +155,21 @@ impl State {
 
     fn view(&self) -> Element<Message> {
         let timer = if self.paused {
-            button("PAUSED")
+            let time_passed_seconds = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs()
+                - match self.sessions.last() {
+                    Some(s) => s.end,
+                    None => UNIX_EPOCH.elapsed().unwrap().as_secs(),
+                };
+
+            button(text(format_text(time_passed_seconds, false)).font(iced::Font::MONOSPACE))
         } else {
             let time_passed_seconds = SystemTime::now()
                 .duration_since(self.start)
                 .unwrap()
                 .as_secs();
-
             let highlight_color = highlight_col(&time_passed_seconds);
 
             button(
@@ -186,13 +202,10 @@ impl State {
     }
 
     fn subscription(&self) -> iced::Subscription<Message> {
-        if self.paused {
-            return iced::Subscription::none();
-        }
-
-        iced::Subscription::batch(vec![
-            iced::time::every(Duration::from_millis(500)).map(|_| Message::Refresh)
-        ])
+        iced::Subscription::batch(vec![iced::time::every(Duration::from_millis(
+            if self.paused { 1000 } else { 500 },
+        ))
+        .map(|_| Message::Refresh)])
     }
 
     fn toggle_pause(&mut self) {
