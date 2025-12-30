@@ -1,6 +1,6 @@
 # Stopwatch
 
-v0.1: customizable stopwatch  
+[v0.1](https://github.com/Zarthus/stopwatch/tree/v0.1): customizable stopwatch  
 v0.2: minimal dependency, a 20-20-20 rule following stopwatch with very limited configuration.
 
 Configuration: See `src/main.rs`: `Config::from_env`

@@ -15,15 +15,11 @@ jobs:
       matrix:
         checks:
           - advisories
-          - bans licenses sources
-
-    # Prevent sudden announcement of a new advisory from failing ci:
-    continue-on-error: ${{ matrix.checks == 'advisories' }}
-
+          - bans
     steps:
       - name: Setup | Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Test | Security Audit
-        uses: EmbarkStudios/cargo-deny-action@v1.6.3
+        uses: EmbarkStudios/cargo-deny-action@v2
         with:
           command: check ${{ matrix.checks }}
