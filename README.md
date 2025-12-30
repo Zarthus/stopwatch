@@ -1,22 +1,14 @@
 # Stopwatch
 
-Very simple GUI stopwatch
+v0.1: customizable stopwatch  
+v0.2: minimal dependency, a 20-20-20 rule following stopwatch with very limited configuration.
 
-Built mostly to track how long I've been doing one activity to switch things up.
-Colours yellow when a break is due, and red when you really should take one.
-
-Configurable via a TOML file in your `$XDG_CONFIG_DIR`.
-
-![img](resource/timers.png)
+Configuration: See `src/main.rs`: `Config::from_env`
 
 ## Installation
 
 Add as software:
 - `cargo install zarthus_stopwatch`
-
-## Contributing
-
-Contributions are welcome! Feel free to open an issue or submit a pull request.
 
 ## License
 

@@ -1,26 +1,16 @@
 [package]
 name = "zarthus_stopwatch"
-description = "A minimal stopwatch application with hints for taking breaks"
-version = "0.1.0"
-edition = "2021"
+description = "Generic UI stopwatch - follows 20-20-20 rule to remind you to take breaks while working on your computer."
+version = "0.2.0"
+edition = "2024"
 license = "MIT or Apache-2.0"
 repository = "stopwatch"
 readme = "README.md"
 publish = true
 exclude = ["resource/*"]
 
-[dependencies]
-dirs = { version = "5.0" }
-serde = { version = "1.0", features = ["derive"] }
-toml = { version = "0.8", features = ["preserve_order"] }
-#iced = { version = "0.13", features = ["smol"] }
-
 [dependencies.iced]
 git = "https://github.com/iced-rs/iced.git"
-# branch = "master"
-rev = "555ee3e9"
-features = ["smol", "image"]
+rev = "15c0e39" # 0.14-dev
+features = ["smol", "image", "x11"]
 
-[features]
-default = ["store_sessions"]
-store_sessions = []
