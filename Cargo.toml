@@ -10,7 +10,12 @@ publish = true
 exclude = ["resource/*"]
 
 [dependencies.iced]
-git = "https://github.com/iced-rs/iced.git"
-rev = "15c0e39" # 0.14-dev
-features = ["smol", "image", "x11"]
+version = "0.14"
+# git = "https://github.com/iced-rs/iced.git"
+# branch = "master"
+#rev = "15c0e39" # 0.14-dev
+features = ["smol", "image"]
 
+[features]
+wayland = ["iced/wayland"]
+x11 = ["iced/x11"]
